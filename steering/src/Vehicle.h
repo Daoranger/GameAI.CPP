@@ -12,16 +12,15 @@
 class Vehicle
 {
 public:
+    float mass;
     sf::Vector2f position;
     sf::Vector2f velocity;
 
+    float maxSpeed;
+    float maxForce;
+
     sf::Vector2f heading;
     sf::Vector2f side;
-
-    float mass;
-    float maxSpeed = 100;
-    float maxForce;
-    float maxTurnRate;
 
     Vehicle(sf::Vector2f startPos);
     void update(float dt, sf::Vector2u windowSize);
