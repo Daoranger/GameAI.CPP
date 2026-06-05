@@ -41,3 +41,36 @@ sf::Vector2f SteeringBehaviors::arrive(sf::Vector2f target) const
     // stop when reached target
     return sf::Vector2f(0,0);
 }
+
+sf::Vector2f SteeringBehaviors::pursuit(const Vehicle& evader) const
+{
+    // vector from pursuer to evader
+    sf::Vector2f toEvader = evader.position - vehicle_.position;
+
+    // pursuer and evader headings give us the directions the two are facing
+    // dot product tell us how align
+    // 1.0: facing exactly same direction (theta = 0 degree)
+    // 0.0: perpendicular direction (theta = 90 degree)
+    //-1.0: facing directly opposite directions (theta = 180 degree)
+    // > 0: mostly same direction
+    // < 0: most opposite direction
+    double relativeHeading = vehicle_.heading().dot(evader.heading());
+
+    // first check: checks whether evader is in-front of the pursuer
+    // positive -> evader is ahead, negative -> evade is behind
+
+    // second check: checks whether the two ships are facing almost opposite direction
+
+    // both toEvader and vehicle_.heading are both evectors from pursuer.
+    // so if they point same direction, > 0, evader is in-front
+    // but if they point opposite direction, < 0, evader is behind
+    if ((toEvader.dot(vehicle_.heading()) > 0) && (relativeHeading < -0.95))
+    {
+        return seek(evader.position);
+    }
+
+    float lookAheadTime = toEvader.length() / vehicle_.maxSpeed + evader.speed();
+
+    // the math below say where will evader be after lookAheadTime (secs)
+    return seek(evader.position + evader.velocity * lookAheadTime);
+}
