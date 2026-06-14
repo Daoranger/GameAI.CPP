@@ -69,8 +69,17 @@ sf::Vector2f SteeringBehaviors::pursuit(const Vehicle& evader) const
         return seek(evader.position);
     }
 
-    float lookAheadTime = toEvader.length() / vehicle_.maxSpeed + evader.speed();
+    float lookAheadTime = toEvader.length() / (vehicle_.maxSpeed + evader.speed());
 
     // the math below say where will evader be after lookAheadTime (secs)
     return seek(evader.position + evader.velocity * lookAheadTime);
+}
+
+sf::Vector2f SteeringBehaviors::evade(const Vehicle& pursuer) const
+{
+    sf::Vector2f toPursuer = pursuer.position - vehicle_.position;
+
+    float lookAheadTime = toPursuer.length() / (vehicle_.maxSpeed + pursuer.speed());
+
+    return flee(pursuer.position + pursuer.velocity * lookAheadTime);
 }

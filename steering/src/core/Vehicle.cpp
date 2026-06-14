@@ -29,6 +29,11 @@ void Vehicle::update(float dt, sf::Vector2f steeringForce, sf::Vector2u windowSi
         velocity = velocity.normalized() * maxSpeed;
 
     position += velocity * dt;
+
+    if (position.x > windowSize.x) position.x = 0;
+    if (position.y > windowSize.y) position.y = 0;
+    if (position.x < 0) position.x = windowSize.x;
+    if (position.y < 0) position.y = windowSize.y;
 }
 
 void Vehicle::render(sf::RenderWindow& window)

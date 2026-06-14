@@ -21,7 +21,8 @@ private:
 
     sf::RenderWindow window;
     sf::Clock clock;
-    Vehicle vehicle;
+    Vehicle vehicle1;
+    Vehicle vehicle2;
 };
 
 #endif //STEERINGBEHAVIORS_GAME_H

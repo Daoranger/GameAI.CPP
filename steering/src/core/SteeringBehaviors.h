@@ -18,6 +18,7 @@ public:
     sf::Vector2f flee(sf::Vector2f target) const;
     sf::Vector2f arrive(sf::Vector2f target) const;
     sf::Vector2f pursuit(const Vehicle& evader) const;
+    sf::Vector2f evade(const Vehicle& pursuer) const;
 
 
 

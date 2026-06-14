@@ -5,8 +5,9 @@
 #include "Game.h"
 
 Game::Game()
-    : window(sf::VideoMode(sf::Vector2u(1000, 1000)), "Steering Behaviors")
-    , vehicle(sf::Vector2f(500, 500))
+    : window(sf::VideoMode(sf::Vector2u(1920, 1080)), "Steering Behaviors")
+    , vehicle1(sf::Vector2f(300, 540))
+    , vehicle2(sf::Vector2f(1620, 540))
 {
 }
 
@@ -39,13 +40,16 @@ void Game::update()
 {
     float dt = clock.restart().asSeconds();
     sf::Vector2f target = sf::Vector2f(sf::Mouse::getPosition(window));
-    sf::Vector2f steeringForce = vehicle.steeringBehaviors.arrive(target);
-    vehicle.update(dt, steeringForce, window.getSize());
+    sf::Vector2f steeringForceV1 = vehicle1.steeringBehaviors.seek(target);
+    sf::Vector2f steeringForceV2 = vehicle2.steeringBehaviors.evade(vehicle1.position);
+    vehicle1.update(dt, steeringForceV1, window.getSize());
+    vehicle2.update(dt, steeringForceV2, window.getSize());
 }
 
 void Game::render()
 {
     window.clear(sf::Color::Black);
-    vehicle.render(window);
+    vehicle1.render(window);
+    vehicle2.render(window);
     window.display();
 }

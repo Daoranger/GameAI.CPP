@@ -22,12 +22,18 @@ public:
     float maxSpeed;
     float maxForce;
 
-    sf::Vector2f heading() const { return velocity.normalized(); }
+    sf::Vector2f heading() const
+    {
+        // guard in-case velocity is zero-vector
+        // normalizing zero-vector is UB
+        if (velocity.length() < 1e-6f)
+            return {0.f, -1.f};
+        return velocity.normalized();
+    }
     sf::Vector2f side() const { return velocity.perpendicular().normalized(); }
     float speed() const { return velocity.length(); }
 
     SteeringBehaviors steeringBehaviors;
-
 
     Vehicle(sf::Vector2f startPos);
     void update(float dt, sf::Vector2f steeringForce, sf::Vector2u windowSize);
