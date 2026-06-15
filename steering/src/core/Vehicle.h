@@ -26,11 +26,16 @@ public:
     {
         // guard in-case velocity is zero-vector
         // normalizing zero-vector is UB
-        if (velocity.length() < 1e-6f)
-            return {0.f, -1.f};
+        if (velocity.lengthSquared() < 1e-6f)
+            return {1.f, 0.f};
         return velocity.normalized();
     }
-    sf::Vector2f side() const { return velocity.perpendicular().normalized(); }
+    sf::Vector2f side() const
+    {
+        if (velocity.lengthSquared() < 1e-6f)
+            return {0.f, 1.f};
+        return velocity.perpendicular().normalized();
+    }
     float speed() const { return velocity.length(); }
 
     SteeringBehaviors steeringBehaviors;

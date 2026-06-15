@@ -1,8 +1,10 @@
 #include "SteeringBehaviors.h"
 #include "Vehicle.h"
+#include "Utils.h"
 
 SteeringBehaviors::SteeringBehaviors(const Vehicle& vehicle)
-    :vehicle_(vehicle)
+    : vehicle_(vehicle)
+    , wanderTarget(wanderRadius, 0)
 {
 }
 
@@ -64,10 +66,11 @@ sf::Vector2f SteeringBehaviors::pursuit(const Vehicle& evader) const
     // both toEvader and vehicle_.heading are both evectors from pursuer.
     // so if they point same direction, > 0, evader is in-front
     // but if they point opposite direction, < 0, evader is behind
-    if ((toEvader.dot(vehicle_.heading()) > 0) && (relativeHeading < -0.95))
-    {
-        return seek(evader.position);
-    }
+    // comment out for now cuz we always them to pursue
+    // if ((toEvader.dot(vehicle_.heading()) > 0) && (relativeHeading < -0.95))
+    // {
+    //     return seek(evader.position);
+    // }
 
     float lookAheadTime = toEvader.length() / (vehicle_.maxSpeed + evader.speed());
 
@@ -82,4 +85,35 @@ sf::Vector2f SteeringBehaviors::evade(const Vehicle& pursuer) const
     float lookAheadTime = toPursuer.length() / (vehicle_.maxSpeed + pursuer.speed());
 
     return flee(pursuer.position + pursuer.velocity * lookAheadTime);
+}
+
+// we always assume the vehicle is at 0,0 facing to the right
+sf::Vector2f SteeringBehaviors::wander(float dt)
+{
+    // adding small random displacement to the target
+    wanderTarget += sf::Vector2f(
+        randomClamped() * wanderJitter * dt,
+        randomClamped() * wanderJitter * dt
+        );
+
+    if (wanderTarget.lengthSquared() > 1e-6f)
+        wanderTarget = wanderTarget.normalized() * wanderRadius;
+
+    printf("wanderTarget: %.2f, %.2f\n", wanderTarget.x, wanderTarget.y);
+
+    sf::Vector2f targetLocal = wanderTarget + sf::Vector2f(wanderDistance, 0);
+    sf::Vector2f targetWorld = pointToWorldSpace(targetLocal);
+    return seek(targetWorld);
+}
+
+sf::Vector2f SteeringBehaviors::pointToWorldSpace(sf::Vector2f targetLocal)
+{
+    sf::Vector2f heading = vehicle_.heading();
+    sf::Vector2f side = vehicle_.side();
+    sf::Vector2f position = vehicle_.position;
+
+    return sf::Vector2f(
+        position.x + heading.x * targetLocal.x + side.x * targetLocal.y,
+        position.y + heading.y * targetLocal.x + side.y * targetLocal.y
+    );
 }
