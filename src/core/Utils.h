@@ -24,7 +24,7 @@ T randomInRange(T min, T max)
 }
 
 // util for wander target's position
-float randomClamped()
+inline float randomClamped()
 {
     return randomInRange(-1.f, 1.f);
 }

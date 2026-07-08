@@ -7,12 +7,14 @@
 #include "SFML/Graphics/CircleShape.hpp"
 
 Game::Game()
-    : window(sf::VideoMode(sf::Vector2u(1920, 1080)), "Steering Behaviors")
+    : window(sf::VideoMode(sf::Vector2u(3072, 1920)), "Steering Behaviors")
     , vehicle1(sf::Vector2f(300, 540))
     , vehicle2(sf::Vector2f(1800, 100))
 {
     vehicle1.maxSpeed = 300;
     vehicle2.maxSpeed = 200;
+
+    spawnObstacles(3);
 }
 
 void Game::run()
@@ -69,5 +71,22 @@ void Game::render()
     };
     window.draw(line, 2, sf::PrimitiveType::Lines);
 
+    for (auto obstacle : obstacles)
+    {
+        obstacle.render(window);
+    }
+
     window.display();
+}
+
+void Game::spawnObstacles(int amount)
+{
+    for (int i = 0; i < amount; i++)
+    {
+        Obstacle obstacle(randomInRange(50.0f, 200.0f));
+        float posX = randomInRange(0, 1920);
+        float posY = randomInRange(0, 1080);
+        obstacle.setPosition(sf::Vector2f(posX, posY));
+        obstacles.push_back(obstacle);
+    }
 }

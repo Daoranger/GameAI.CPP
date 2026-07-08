@@ -7,6 +7,9 @@
 
 #include "SFML/Graphics/RenderWindow.hpp"
 #include "../core/Vehicle.h"
+#include "../core/Obstacle.h"
+#include "../core/Utils.h"
+
 
 class Game
 {
@@ -19,10 +22,13 @@ private:
     void update();
     void render();
 
+    void spawnObstacles(int amount);
+
     sf::RenderWindow window;
     sf::Clock clock;
     Vehicle vehicle1;
     Vehicle vehicle2;
+    std::vector<Obstacle> obstacles;
 };
 
 #endif //STEERINGBEHAVIORS_GAME_H
