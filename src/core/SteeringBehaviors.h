@@ -5,6 +5,7 @@
 #ifndef STEERINGBEHAVIORS_STEERINGBEHAVIORS_H
 #define STEERINGBEHAVIORS_STEERINGBEHAVIORS_H
 
+#include "Obstacle.h"
 #include "SFML/System/Vector2.hpp"
 
 class Vehicle;
@@ -20,6 +21,7 @@ public:
     sf::Vector2f pursuit(const Vehicle& evader) const;
     sf::Vector2f evade(const Vehicle& pursuer) const;
     sf::Vector2f wander();
+    sf::Vector2f obstacleAvoidance(const std::vector<Obstacle*>& obstacles);
 
     float wanderRadius = 30.0f;
     float wanderDistance = 100.0f;

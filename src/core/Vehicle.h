@@ -21,6 +21,9 @@ public:
     sf::Vector2f velocity;
     float maxSpeed;
     float maxForce;
+    float collision_radius_;
+    float detection_box_length_;
+    float min_detection_box_length_;
 
     sf::Vector2f heading() const
     {
@@ -41,8 +44,8 @@ public:
 private:
     sf::Vector2f heading_ = {1.f, 0.f};
     sf::Vector2f side_ = {0.f, 1.f};
-    sf::Texture texture;
-    sf::Sprite sprite;
+    sf::Texture texture_;
+    sf::Sprite sprite_;
 };
 
 #endif //STEERINGBEHAVIORS_VEHICLE_H

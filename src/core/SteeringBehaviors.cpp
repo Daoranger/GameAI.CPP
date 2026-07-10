@@ -84,6 +84,12 @@ sf::Vector2f SteeringBehaviors::wander()
     return seek(targetWorld);
 }
 
+sf::Vector2f SteeringBehaviors::obstacleAvoidance(const std::vector<Obstacle*>& obstacles)
+{
+    vehicle_.detection_box_length_ = vehicle_.min_detection_box_length_ + (vehicle_.speed() / vehicle_.maxSpeed) * vehicle_.min_detection_box_length_;
+
+}
+
 sf::Vector2f SteeringBehaviors::pointToWorldSpace(sf::Vector2f targetLocal)
 {
     sf::Vector2f heading = vehicle_.heading();

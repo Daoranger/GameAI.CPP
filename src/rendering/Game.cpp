@@ -63,14 +63,6 @@ void Game::render()
     vehicle1.render(window);
     vehicle2.render(window);
 
-
-    // line from pursuer to predicted point
-    sf::Vertex line[] = {
-        sf::Vertex{vehicle2.position, sf::Color::Green},
-        sf::Vertex{vehicle2.position + sf::Vector2f(vehicle2.heading().x * 1000, vehicle2.heading().y * 1000), sf::Color::Green}
-    };
-    window.draw(line, 2, sf::PrimitiveType::Lines);
-
     for (auto obstacle : obstacles)
     {
         obstacle.render(window);
