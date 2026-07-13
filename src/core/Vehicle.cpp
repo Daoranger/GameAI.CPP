@@ -39,8 +39,12 @@ void Vehicle::update(float dt, sf::Vector2f steeringForce, sf::Vector2u windowSi
     if (speed() > maxSpeed)
         velocity = velocity.normalized() * maxSpeed;
 
-    heading_ = velocity.normalized();
-    side_ = heading_.perpendicular();
+    // avoids normalizing a zero vector
+    if (velocity.lengthSquared() > 1e-6f)
+    {
+        heading_ = velocity.normalized();
+        side_ = heading_.perpendicular();
+    }
 
     position += velocity * dt;
 

@@ -13,7 +13,7 @@ class Vehicle;
 class SteeringBehaviors
 {
 public:
-    SteeringBehaviors(const Vehicle& vehicle);
+    SteeringBehaviors(Vehicle& vehicle);
 
     sf::Vector2f seek(sf::Vector2f target) const;
     sf::Vector2f flee(sf::Vector2f target) const;
@@ -21,7 +21,7 @@ public:
     sf::Vector2f pursuit(const Vehicle& evader) const;
     sf::Vector2f evade(const Vehicle& pursuer) const;
     sf::Vector2f wander();
-    sf::Vector2f obstacleAvoidance(const std::vector<Obstacle*>& obstacles);
+    sf::Vector2f obstacleAvoidance(const std::vector<std::unique_ptr<Obstacle>>& obstacles);
 
     float wanderRadius = 30.0f;
     float wanderDistance = 100.0f;
@@ -29,8 +29,11 @@ public:
     sf::Vector2f wanderTarget;
 
 private:
-    const Vehicle& vehicle_;
+    Vehicle& vehicle_;
     sf::Vector2f pointToWorldSpace(sf::Vector2f targetLocal);
+    sf::Vector2f pointToLocalSpace(sf::Vector2f targetWorld);
+    sf::Vector2f vectorToWorldSpace(sf::Vector2f vecLocal);
+    void tagObstaclesInRange(const std::vector<std::unique_ptr<Obstacle>>& obstacles, float range);
 
 };
 

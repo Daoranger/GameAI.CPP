@@ -28,7 +28,7 @@ private:
     sf::Clock clock;
     Vehicle vehicle1;
     Vehicle vehicle2;
-    std::vector<Obstacle> obstacles;
+    std::vector<std::unique_ptr<Obstacle>> obstacles;
 };
 
 #endif //STEERINGBEHAVIORS_GAME_H

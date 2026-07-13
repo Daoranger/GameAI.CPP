@@ -47,11 +47,11 @@ void Game::update()
     float dt = clock.restart().asSeconds();
     sf::Vector2f target = sf::Vector2f(sf::Mouse::getPosition(window));
 
-    //sf::Vector2f steeringForceV1 = vehicle1.steeringBehaviors.wander(dt);
     sf::Vector2f steeringForceV1 = sf::Vector2f(100,0);
 
-    sf::Vector2f steeringForceV2 = vehicle2.steeringBehaviors.wander();
-    //sf::Vector2f steeringForceV2 = vehicle2.steeringBehaviors.seek(vehicle1.position);
+    sf::Vector2f seekForce = vehicle2.steeringBehaviors.seek(target);
+    sf::Vector2f avoidFore = vehicle2.steeringBehaviors.obstacleAvoidance(obstacles);
+    sf::Vector2f steeringForceV2 = seekForce + avoidFore * 2.0f;
 
     vehicle1.update(dt, steeringForceV1, window.getSize());
     vehicle2.update(dt, steeringForceV2, window.getSize());
@@ -63,9 +63,9 @@ void Game::render()
     vehicle1.render(window);
     vehicle2.render(window);
 
-    for (auto obstacle : obstacles)
+    for (const auto& obstacle : obstacles)
     {
-        obstacle.render(window);
+        obstacle->render(window);
     }
 
     window.display();
@@ -75,10 +75,10 @@ void Game::spawnObstacles(int amount)
 {
     for (int i = 0; i < amount; i++)
     {
-        Obstacle obstacle(randomInRange(50.0f, 200.0f));
+        auto obstacle = std::make_unique<Obstacle>(randomInRange(50.0f, 200.0f));
         float posX = randomInRange(0, 1920);
         float posY = randomInRange(0, 1080);
-        obstacle.setPosition(sf::Vector2f(posX, posY));
-        obstacles.push_back(obstacle);
+        obstacle->setPosition(sf::Vector2f(posX, posY));
+        obstacles.push_back(std::move(obstacle));
     }
 }

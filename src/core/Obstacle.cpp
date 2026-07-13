@@ -34,3 +34,8 @@ void Obstacle::setPosition(sf::Vector2f pos)
 {
     position_ = pos;
 }
+
+float Obstacle::getCollisionRadius() const
+{
+    return collision_radius_;
+}

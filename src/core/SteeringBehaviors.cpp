@@ -1,8 +1,9 @@
 #include "SteeringBehaviors.h"
 #include "Vehicle.h"
 #include "Utils.h"
+#include <limits>
 
-SteeringBehaviors::SteeringBehaviors(const Vehicle& vehicle)
+SteeringBehaviors::SteeringBehaviors(Vehicle& vehicle)
     : vehicle_(vehicle)
     , wanderTarget(wanderRadius, 0)
 {
@@ -84,10 +85,75 @@ sf::Vector2f SteeringBehaviors::wander()
     return seek(targetWorld);
 }
 
-sf::Vector2f SteeringBehaviors::obstacleAvoidance(const std::vector<Obstacle*>& obstacles)
+sf::Vector2f SteeringBehaviors::obstacleAvoidance(const std::vector<std::unique_ptr<Obstacle>>& obstacles)
 {
     vehicle_.detection_box_length_ = vehicle_.min_detection_box_length_ + (vehicle_.speed() / vehicle_.maxSpeed) * vehicle_.min_detection_box_length_;
 
+    tagObstaclesInRange(obstacles, vehicle_.detection_box_length_);
+
+    Obstacle* closestIntersectingObstacle = nullptr;
+
+    float distToClosestObstacle = std::numeric_limits<float>::max();
+
+    sf::Vector2f localPosOfClosestObstacle;
+
+    for (auto it = obstacles.begin(); it != obstacles.end(); ++it)
+    {
+        // if obstacle is tagged within range
+        if ((*it)->isTagged())
+        {
+            sf::Vector2f localPos = pointToLocalSpace((*it)->getPosition());
+
+            // ignore if behind agent
+            if (localPos.x >= 0)
+            {
+                float expandedRadius = (*it)->getCollisionRadius() + vehicle_.collision_radius_;
+                if (std::fabs(localPos.y) < expandedRadius)
+                {
+                    float circleX = localPos.x;
+                    float circleY = localPos.y;
+
+                    float sqrtPart = std::sqrt(expandedRadius * expandedRadius - circleY * circleY);
+
+                    float ip = circleX - sqrtPart;
+
+                    if (ip <= 0)
+                    {
+                        ip = circleX + sqrtPart;
+                    }
+
+                    // check if this is the closest intersecting obstacle so far
+                    float expandedRadiusOfClosestObstacle = 0.0f;
+                    if (ip < distToClosestObstacle)
+                    {
+                        distToClosestObstacle = ip;
+                        closestIntersectingObstacle = it->get();
+                        localPosOfClosestObstacle = localPos;
+                        expandedRadiusOfClosestObstacle = expandedRadius;
+                    }
+                }
+            }
+        }
+    }
+
+    // no obstacle intersected
+    if (closestIntersectingObstacle == nullptr)
+    {
+        return sf::Vector2f(0.0f, 0.0f);
+    }
+
+    sf::Vector2f steeringForce;
+
+    float multiplier = 1.0 + (vehicle_.detection_box_length_- localPosOfClosestObstacle.x) / vehicle_.detection_box_length_;
+
+    // calculate lateral force
+    steeringForce.y = (closestIntersectingObstacle->getCollisionRadius() - localPosOfClosestObstacle.y) * multiplier;
+
+    // braking force
+    const float brakingWeight = 0.2;
+    steeringForce.x = (closestIntersectingObstacle->getCollisionRadius() - localPosOfClosestObstacle.x) * brakingWeight;
+
+    return vectorToWorldSpace(steeringForce);
 }
 
 sf::Vector2f SteeringBehaviors::pointToWorldSpace(sf::Vector2f targetLocal)
@@ -100,4 +166,47 @@ sf::Vector2f SteeringBehaviors::pointToWorldSpace(sf::Vector2f targetLocal)
         position.x + heading.x * targetLocal.x + side.x * targetLocal.y,
         position.y + heading.y * targetLocal.x + side.y * targetLocal.y
     );
+}
+
+sf::Vector2f SteeringBehaviors::pointToLocalSpace(sf::Vector2f targetWorld)
+{
+    sf::Vector2f heading = vehicle_.heading();
+    sf::Vector2f side = vehicle_.side();
+    sf::Vector2f position = vehicle_.position;
+
+    sf::Vector2f offset = targetWorld - position;
+
+    float localX = offset.x * heading.x + offset.y * heading.y;
+    float localY = offset.x * side.x + offset.y * side.y;
+
+    return sf::Vector2f(localX, localY);
+}
+
+sf::Vector2f SteeringBehaviors::vectorToWorldSpace(sf::Vector2f vecLocal)
+{
+    sf::Vector2f heading = vehicle_.heading();
+    sf::Vector2f side = vehicle_.side();
+
+    return sf::Vector2f(
+        heading.x * vecLocal.x + side.x * vecLocal.y,
+        heading.y * vecLocal.x + side.y * vecLocal.y
+    );
+}
+
+void SteeringBehaviors::tagObstaclesInRange(const std::vector<std::unique_ptr<Obstacle>>& obstacles, float range)
+{
+    float rangeSqrt = range * range;
+    for (const auto& obstacle : obstacles)
+    {
+        obstacle->untag();
+
+        // distance from vehicle to obstacle
+        sf::Vector2f dist = obstacle->getPosition() - vehicle_.position;
+        float distSqrt = dist.x * dist.x  + dist.y * dist.y;
+
+        if (distSqrt < rangeSqrt)
+        {
+            obstacle->tag();
+        }
+    }
 }
