@@ -68,6 +68,8 @@ void Game::render()
         obstacle->render(window);
     }
 
+    wall->render(window);
+
     window.display();
 }
 

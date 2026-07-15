@@ -18,6 +18,7 @@ add_executable(main
         src/core/Vehicle.cpp
         src/core/SteeringBehaviors.cpp
         src/core/Obstacle.cpp
+        src/core/Wall.cpp
 )
 target_compile_features(main PRIVATE cxx_std_17)
 target_link_libraries(main PRIVATE SFML::Graphics)

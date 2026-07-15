@@ -9,6 +9,7 @@
 #include "../core/Vehicle.h"
 #include "../core/Obstacle.h"
 #include "../core/Utils.h"
+#include "../core/Wall.h"
 
 
 class Game
@@ -29,6 +30,7 @@ private:
     Vehicle vehicle1;
     Vehicle vehicle2;
     std::vector<std::unique_ptr<Obstacle>> obstacles;
+    std::unique_ptr<Wall> wall = std::make_unique<Wall>(sf::Vector2f(100.0f, 100.0f), sf::Vector2f(500.0f, 500.0f));
 };
 
 #endif //STEERINGBEHAVIORS_GAME_H
